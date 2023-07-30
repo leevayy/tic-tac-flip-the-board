@@ -1,28 +1,19 @@
 import React, { useState } from "react";
 
 export default function Game() {
-	const [gameState, setGameState] = useState({
+	const initialGameState = {
 		moveCount: 0,
 		status: "Current move: X",
-		statusClass: "X"
-	});
+		statusClass: "X",
+		finish: false
+	};
+
+	const [gameState, setGameState] = useState(initialGameState);
 
 	const width = 3;
 	const height = 3;
 
-	const [board, setBoard] = useState(() => {
-		const defaultSquareValue = "";
-		const initialBoard = [];
-		// filling up 2d array with empty strings
-		for (let y = 0; y < height; y++) {
-			const row = [];
-			for (let x = 0; x < width; x++) {
-				row.push(defaultSquareValue);
-			}
-			initialBoard.push(row);
-		}
-		return initialBoard;
-	});
+	const [board, setBoard] = useState(initBoard(width, height));
 
 	function currentMove(moveCount) {
 		return moveCount % 2 === 0 ? "X" : "O";
@@ -32,19 +23,28 @@ export default function Game() {
 		const newMoveCount = gameState.moveCount + 1;
 		const result = calculateWinner(board.flat());
 		if (result) {
+			const emojipool =
+				"🥳 🎉 🎊 🎁 🎈 🤠 😍 🤩 🕺 💃 ✌️ 🤘 🤟 👆 👍 🙌 👏 🍰 🎂 🧁".split(
+					/\s/g
+				);
+			const getEmoji = () =>
+				emojipool[Math.floor(Math.random() * emojipool.length)];
+
 			setGameState({
 				moveCount: newMoveCount,
 				statusClass: `win ${result}`,
 
 				// TODO: make random emojis +
 				// ! make them fly out
-				status: `🤟 Yoo-hoo "${result}" won!! 🎉`
+				status: `${getEmoji()} Yoo-hoo "${result}" won!! ${getEmoji()}`,
+				finish: true
 			});
 		} else {
 			setGameState({
 				moveCount: newMoveCount,
 				statusClass: `${currentMove(newMoveCount)}`,
-				status: `Current move: ${currentMove(newMoveCount)}`
+				status: `Current move: ${currentMove(newMoveCount)}`,
+				finish: false
 			});
 		}
 	}
@@ -62,19 +62,34 @@ export default function Game() {
 				board={board}
 				setBoard={setBoard}
 			/>
-			<ShuffleButton onMove={handleOnMove} board={board} setBoard={setBoard} />
+			{!gameState.finish ? (
+				<ShuffleButton
+					onMove={handleOnMove}
+					board={board}
+					setBoard={setBoard}
+				/>
+			) : (
+				<RestartButton
+					width={width}
+					height={height}
+					initialGameState={initialGameState}
+					setBoard={setBoard}
+					setGameState={setGameState}
+				/>
+			)}
 		</div>
 	);
 }
 
-function ShuffleButton({ onMove, board, setBoard, shuffleStyle: shuffleClass }) {
+function ShuffleButton({ onMove, board, setBoard }) {
 	// TODO: fix shuffle to be random across everyting
+	// * smth like flatten the array shuffle and then reassemble it
 	function shuffle(array) {
 		let currentIndex = array.length,
 			randomIndex;
 
 		// While there remain elements to shuffle.
-		while (currentIndex != 0) {
+		while (currentIndex !== 0) {
 			// Pick a remaining element.
 			randomIndex = Math.floor(Math.random() * currentIndex);
 			currentIndex--;
@@ -95,7 +110,36 @@ function ShuffleButton({ onMove, board, setBoard, shuffleStyle: shuffleClass }) 
 		setBoard(newBoard);
 	}
 
-	return <button className={`shuffle ${shuffleClass}`} onClick={() => {handleShuffle(); onMove()}}>🔮SHUFFLE🎲</button>
+	return (
+		<button
+			className={"shuffle button"}
+			onClick={() => {
+				handleShuffle();
+				onMove();
+			}}
+		>
+			🔮SHUFFLE🎲
+		</button>
+	);
+}
+
+function RestartButton({
+	width,
+	height,
+	setBoard,
+	setGameState,
+	initialGameState
+}) {
+	function handleRestart() {
+		setGameState(initialGameState);
+		setBoard(initBoard(width, height));
+	}
+
+	return (
+		<button className="restart button" onClick={handleRestart}>
+			☑️RESTART🔁
+		</button>
+	);
 }
 
 function Board({ currentMove, onMove, width, height, board, setBoard }) {
@@ -143,6 +187,20 @@ function Square({ id, value, handleClick }) {
 	);
 }
 
+function initBoard(width, height) {
+	const defaultSquareValue = "";
+	const initialBoard = [];
+	// filling up 2d array with empty strings
+	for (let y = 0; y < height; y++) {
+		const row = [];
+		for (let x = 0; x < width; x++) {
+			row.push(defaultSquareValue);
+		}
+		initialBoard.push(row);
+	}
+	return initialBoard;
+}
+
 function calculateWinner(flatBoard) {
 	const lines = [
 		[0, 1, 2],
@@ -164,7 +222,6 @@ function calculateWinner(flatBoard) {
 			return flatBoard[a];
 		}
 	}
-	if (!flatBoard.includes(''))
-		return 'friendship'
+	if (!flatBoard.includes("")) return "friendship";
 	return null;
 }

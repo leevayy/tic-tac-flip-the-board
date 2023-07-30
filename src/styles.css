@@ -59,7 +59,7 @@ body {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 1px solid #dddddd;
   float: left;
   font-size: 40pt;
   font-weight: bold;
@@ -70,8 +70,15 @@ body {
   width: 100px;
 }
 
-.square:hover {
-  background: #eeeeee;
+@media (hover) {
+  .square:hover {
+    background: #eeeeee;
+  }
+}
+@media (hover: none) {
+  .square:active {
+    background: #eeeeee;
+  }
 }
 
 .board-row:after {
@@ -81,7 +88,7 @@ body {
 }
 
 .status {
-  font-size: 36pt;
+  font-size: 32pt;
   text-align: center;
 }
 
@@ -102,10 +109,11 @@ body {
 .game {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  min-width: 300px;
+  min-width: 320px;
   margin: 0 auto;
   gap: 20px;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .board {
@@ -119,17 +127,30 @@ body {
   color: #367E18;
 }
 
-.shuffle {
+.button {
   text-transform: uppercase;
-  background-color: #F57328;
   font-size: 18pt;
   width: 300px;
-  height: 40px;
-  margin: 0 auto;
+  height: 50px;
   border-radius: 5px;
   border-color: #e76464;
 }
 
-.shuffle:hover {
-  background-color: #ffa36e;
+.shuffle {
+  background-color: #F57328;
+}
+
+@media (hover) {
+  .button:hover {
+    background-color: #ffa36e;
+  }
+}
+@media (hover: none) {
+  .button:active {
+    background-color: #ffa36e;
+  }
+}
+
+.restart {
+  background-color: #e76464;
 }
