@@ -4,7 +4,7 @@ export default function Game() {
 	const [gameState, setGameState] = useState({
 		moveCount: 0,
 		status: "Current move: X",
-		statusClass: ""
+		statusClass: "X"
 	});
 
 	const width = 3;
@@ -25,7 +25,7 @@ export default function Game() {
 	});
 
 	function currentMove(moveCount) {
-		return moveCount % 2 === 0 ? "X" : "O"
+		return moveCount % 2 === 0 ? "X" : "O";
 	}
 
 	function handleOnMove() {
@@ -34,21 +34,26 @@ export default function Game() {
 		if (result) {
 			setGameState({
 				moveCount: newMoveCount,
-				statusClass: "win",
+				statusClass: `win ${result}`,
+
+				// TODO: make random emojis +
+				// ! make them fly out
 				status: `🤟 Yoo-hoo "${result}" won!! 🎉`
 			});
 		} else {
 			setGameState({
 				moveCount: newMoveCount,
-				statusClass: "",
+				statusClass: `${currentMove(newMoveCount)}`,
 				status: `Current move: ${currentMove(newMoveCount)}`
 			});
 		}
 	}
 
 	return (
-		<div className="Game">
-			<div className={`status ${gameState.statusClass}`}>{gameState.status}</div>
+		<div className="game">
+			<div className={`status ${gameState.statusClass}`}>
+				{gameState.status}
+			</div>
 			<Board
 				currentMove={currentMove(gameState.moveCount)}
 				onMove={handleOnMove}
@@ -57,8 +62,40 @@ export default function Game() {
 				board={board}
 				setBoard={setBoard}
 			/>
+			<ShuffleButton onMove={handleOnMove} board={board} setBoard={setBoard} />
 		</div>
 	);
+}
+
+function ShuffleButton({ onMove, board, setBoard, shuffleStyle: shuffleClass }) {
+	// TODO: fix shuffle to be random across everyting
+	function shuffle(array) {
+		let currentIndex = array.length,
+			randomIndex;
+
+		// While there remain elements to shuffle.
+		while (currentIndex != 0) {
+			// Pick a remaining element.
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+
+			// And swap it with the current element.
+			[array[currentIndex], array[randomIndex]] = [
+				array[randomIndex],
+				array[currentIndex]
+			];
+		}
+
+		return array;
+	}
+
+	function handleShuffle() {
+		const newBoard = shuffle([...board.map((boardRow) => shuffle(boardRow))]);
+
+		setBoard(newBoard);
+	}
+
+	return <button className={`shuffle ${shuffleClass}`} onClick={() => {handleShuffle(); onMove()}}>🔮SHUFFLE🎲</button>
 }
 
 function Board({ currentMove, onMove, width, height, board, setBoard }) {
@@ -78,25 +115,29 @@ function Board({ currentMove, onMove, width, height, board, setBoard }) {
 		setBoard(newBoard);
 	}
 
-	return board.map((boardRow, y) => (
-		<div className="board-row">
-			{boardRow.map((val, x) => {
-				let id = y * width + x;
-				return (
-					<Square
-						id={id}
-						value={val}
-						handleClick={() => handleChangeSquareValue(id)}
-					></Square>
-				);
-			})}
+	return (
+		<div className="board">
+			{board.map((boardRow, y) => (
+				<div className="board-row">
+					{boardRow.map((val, x) => {
+						let id = y * width + x;
+						return (
+							<Square
+								id={id}
+								value={val}
+								handleClick={() => handleChangeSquareValue(id)}
+							></Square>
+						);
+					})}
+				</div>
+			))}
 		</div>
-	));
+	);
 }
 
 function Square({ id, value, handleClick }) {
 	return (
-		<button className="square" onClick={handleClick} id={id}>
+		<button className={`square ${value}`} onClick={handleClick} id={id}>
 			{value}
 		</button>
 	);
@@ -123,5 +164,7 @@ function calculateWinner(flatBoard) {
 			return flatBoard[a];
 		}
 	}
+	if (!flatBoard.includes(''))
+		return 'friendship'
 	return null;
 }
