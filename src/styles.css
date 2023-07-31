@@ -1,9 +1,21 @@
+:root {
+  --main-bg-color: #F6FFDE;
+  --x-color: #FF2442;
+  --x-out-color: #ff5959;
+  --o-color: #3DB2FF;
+  --square-color: #EDF4F2;
+  --square-hover-color: #eeeeee;
+  --default-button-color: #C9DBB2;
+  --default-button-border-color: #AAC8A7;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   font-family: sans-serif;
+  font-weight: bold;
   margin: 20px;
   padding: 0;
 }
@@ -51,28 +63,34 @@ ul {
 }
 
 body {
-  font-family: sans-serif;
+  font-family: 'Inconsolata', monospace;
   margin: 20px;
   padding: 0;
-  background-color: #FFE9A0;
+  background-color: var(--main-bg-color);
 }
 
 .square {
-  background: #fff;
-  border: 1px solid #dddddd;
+  background: var(--square-color);
+  border: 2px solid #AAC8A7;
   float: left;
+  
   font-size: 40pt;
   font-weight: bold;
   line-height: 42pt;
-  height: 100px;
-  padding: 0;
+  
   text-align: center;
+  padding: 0;
+  
+  
   width: 100px;
+  height: 100px;
+
+  transition: background 0.25s ease-in-out;
 }
 
 @media (hover) {
   .square:hover {
-    background: #eeeeee;
+    background: var(--square-hover-color);
   }
 }
 @media (hover: none) {
@@ -93,17 +111,17 @@ body {
 }
 
 .status.X:not(.win) {
-  color: #CC3636;
+  color: var(--x-out-color);
 }
 .status.O:not(.win) {
-  color: #367E18;
+  color: var(--o-color);
 }
 
 .status.win.O {
-  background-color: #73d34a;
+  background-color: var(--o-color);
 }
 .status.win.X {
-  background-color: #e76464;
+  background-color: var(--x-out-color);
 }
 
 .game {
@@ -121,36 +139,34 @@ body {
 }
 
 .square.X {
-  color: #CC3636;
+  color: var(--x-color);
 }
 .square.O {
-  color: #367E18;
+  color: var(--o-color);
 }
 
 .button {
+  font-family: 'Inconsolata', monospace;
+  font-weight: bold;
   text-transform: uppercase;
-  font-size: 18pt;
+  font-size: 20pt;
   width: 300px;
   height: 50px;
   border-radius: 5px;
-  border-color: #e76464;
-}
+  border-color: var(--default-button-border-color);
+  background-color: var(--default-button-color);
 
-.shuffle {
-  background-color: #F57328;
+
+  transition: 0.1s ease-in-out;
 }
 
 @media (hover) {
   .button:hover {
-    background-color: #ffa36e;
+    background-color: var(--default-button-border-color);
   }
 }
 @media (hover: none) {
   .button:active {
-    background-color: #ffa36e;
+    background-color: var(--default-button-border-color);
   }
-}
-
-.restart {
-  background-color: #e76464;
 }

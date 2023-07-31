@@ -4,7 +4,7 @@ export default function Game() {
 	const initialGameState = {
 		moveCount: 0,
 		status: "Current move: X",
-		statusClass: "X",
+		currentMove: "X",
 		finish: false
 	};
 
@@ -32,7 +32,7 @@ export default function Game() {
 
 			setGameState({
 				moveCount: newMoveCount,
-				statusClass: `win ${result}`,
+				currentMove: `win ${result}`,
 
 				// TODO: make random emojis +
 				// ! make them fly out
@@ -42,7 +42,7 @@ export default function Game() {
 		} else {
 			setGameState({
 				moveCount: newMoveCount,
-				statusClass: `${currentMove(newMoveCount)}`,
+				currentMove: `${currentMove(newMoveCount)}`,
 				status: `Current move: ${currentMove(newMoveCount)}`,
 				finish: false
 			});
@@ -51,7 +51,7 @@ export default function Game() {
 
 	return (
 		<div className="game">
-			<div className={`status ${gameState.statusClass}`}>
+			<div className={`status ${gameState.currentMove}`}>
 				{gameState.status}
 			</div>
 			<Board
@@ -137,7 +137,7 @@ function RestartButton({
 
 	return (
 		<button className="restart button" onClick={handleRestart}>
-			☑️RESTART🔁
+			☑️ RESTART 🔁
 		</button>
 	);
 }
@@ -202,6 +202,7 @@ function initBoard(width, height) {
 }
 
 function calculateWinner(flatBoard) {
+	// TODO fix bug: doesn't always work for shuffle button
 	const lines = [
 		[0, 1, 2],
 		[3, 4, 5],
