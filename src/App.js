@@ -4,7 +4,7 @@ export default function Game() {
 	const initialGameState = {
 		moveCount: 0,
 		status: "Current move: X",
-		currentMove: "X",
+		statusClass: "X",
 		finish: false
 	};
 
@@ -21,7 +21,7 @@ export default function Game() {
 
 	function handleOnMove() {
 		const newMoveCount = gameState.moveCount + 1;
-		const result = calculateWinner(board.flat());
+		const result = calculateWinner(board);
 		if (result) {
 			const emojipool =
 				"🥳 🎉 🎊 🎁 🎈 🤠 😍 🤩 🕺 💃 ✌️ 🤘 🤟 👆 👍 🙌 👏 🍰 🎂 🧁".split(
@@ -32,7 +32,7 @@ export default function Game() {
 
 			setGameState({
 				moveCount: newMoveCount,
-				currentMove: `win ${result}`,
+				statusClass: `win ${result}`,
 
 				// TODO: make random emojis +
 				// ! make them fly out
@@ -42,7 +42,7 @@ export default function Game() {
 		} else {
 			setGameState({
 				moveCount: newMoveCount,
-				currentMove: `${currentMove(newMoveCount)}`,
+				statusClass: `${currentMove(newMoveCount)}`,
 				status: `Current move: ${currentMove(newMoveCount)}`,
 				finish: false
 			});
@@ -51,7 +51,7 @@ export default function Game() {
 
 	return (
 		<div className="game">
-			<div className={`status ${gameState.currentMove}`}>
+			<div className={`status ${gameState.statusClass}`}>
 				{gameState.status}
 			</div>
 			<Board
@@ -137,7 +137,7 @@ function RestartButton({
 
 	return (
 		<button className="restart button" onClick={handleRestart}>
-			☑️ RESTART 🔁
+			☑️RESTART🔁
 		</button>
 	);
 }
@@ -149,7 +149,7 @@ function Board({ currentMove, onMove, width, height, board, setBoard }) {
 		// y=(id-x)//width and x=id%width
 		let x = id % width;
 		let y = Math.floor((id - x) / width);
-		if (board[y][x] !== "" || calculateWinner(board.flat())) {
+		if (board[y][x] !== "" || calculateWinner(board)) {
 			return;
 		}
 
@@ -201,28 +201,49 @@ function initBoard(width, height) {
 	return initialBoard;
 }
 
-function calculateWinner(flatBoard) {
-	// TODO fix bug: doesn't always work for shuffle button
-	const lines = [
-		[0, 1, 2],
-		[3, 4, 5],
-		[6, 7, 8],
-		[0, 3, 6],
-		[1, 4, 7],
-		[2, 5, 8],
-		[0, 4, 8],
-		[2, 4, 6]
-	];
-	for (let i = 0; i < lines.length; i++) {
-		const [a, b, c] = lines[i];
-		if (
-			flatBoard[a] &&
-			flatBoard[a] === flatBoard[b] &&
-			flatBoard[a] === flatBoard[c]
-		) {
-			return flatBoard[a];
+function calculateWinner(board) {
+	const checkHorizontal = (board) => {
+		for (const row of board) {
+			if (!row.includes(undefined) && (new Set(row)).size === 1) {
+				return row[0];
+			}
+		}
+	};
+	let result;
+
+	// horizontal win
+	result = checkHorizontal(board);
+	if (result) {
+		return result;
+	};
+
+	// transpose board and then we check as if it was horizontal
+	const transposedBoard = [];
+	const size = board.length;
+	for (let i = 0; i < size; i++) {
+		transposedBoard.push([]);
+		for (let j = 0; j < size; j++) {
+			transposedBoard[i].push(board[j][i]);
 		}
 	}
-	if (!flatBoard.includes("")) return "friendship";
-	return null;
+	
+	result = checkHorizontal(transposedBoard);
+	if (result) {
+		return result;
+	};
+
+	// express diagonals as horizontal rows and solve as for horizontal
+	const diagonals = [[], []];
+	let inc = 0;
+	let dec = size - 1;
+	while (inc < size) {
+		diagonals[0].push(board[inc][inc]);
+		diagonals[1].push(board[dec][inc]);
+		inc++;
+		dec--;
+	}
+	result = checkHorizontal(diagonals);
+	if (result) {
+		return result;
+	}
 }
