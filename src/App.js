@@ -84,28 +84,39 @@ export default function Game() {
 function ShuffleButton({ onMove, board, setBoard }) {
 	// TODO: fix shuffle to be random across everyting
 	// * smth like flatten the array shuffle and then reassemble it
-	function shuffle(array) {
-		let currentIndex = array.length,
-			randomIndex;
-
-		// While there remain elements to shuffle.
+	function shuffle(board) {
+		const flatBoard = board.flat();
+		let currentIndex = flatBoard.length;
 		while (currentIndex !== 0) {
 			// Pick a remaining element.
-			randomIndex = Math.floor(Math.random() * currentIndex);
+			let randomIndex = Math.floor(Math.random() * currentIndex);
 			currentIndex--;
 
 			// And swap it with the current element.
-			[array[currentIndex], array[randomIndex]] = [
-				array[randomIndex],
-				array[currentIndex]
+			[flatBoard[currentIndex], flatBoard[randomIndex]] = [
+				flatBoard[randomIndex],
+				flatBoard[currentIndex]
 			];
 		}
 
-		return array;
+		const size = board.length;
+		const newBoard = [];
+		for (let i = 0; i < size; i++) {
+			newBoard.push([]);
+		}
+
+		let r = 0;
+		for (let i = 0; i < flatBoard.length; i++) {
+			newBoard[r].push(flatBoard[i]);
+			if ((i+1) % size === 0) {
+				r++;
+			}
+		}
+		return newBoard;
 	}
 
 	function handleShuffle() {
-		const newBoard = shuffle([...board.map((boardRow) => shuffle(boardRow))]);
+		const newBoard = shuffle(board);
 
 		setBoard(newBoard);
 	}
